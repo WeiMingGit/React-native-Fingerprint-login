@@ -10,14 +10,14 @@ import {
 } from 'react-native';
 
 import TouchID from 'react-native-touch-id';
-import * as Keychain from 'react-native-keychain';
+import { firebase } from './src/firebase/config'
 
 
 
-function  showAlert1() {
+function  showAlert1(msg) {
         Alert.alert(
-            'Welcome',
-            'Login Successful',
+            'Hexagon',
+            msg,
             [
                 {
                     text: 'Cancel',
@@ -42,20 +42,30 @@ function handleSubmit(){
 
 function DemoNativeAuth(){
 
-
-
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
+
+  const login = () => {
+
+    firebase.auth().signInWithEmailAndPassword(username,password)
+    .then(success => {
+      showAlert1("Login Successful");
+    })
+    .catch(error =>{
+      showAlert1("Login Unsuccessful " + error);
+    })
+
+  }
 
   const loginWithFingerprint = () => {
 
     TouchID.authenticate('to demo this react-native component')
         .then(success => {
-          console.log("success :",success);
-          showAlert1();
+          showAlert1("Login Successful");
         })
         .catch(error => {
           // Failure code
+          showAlert1("Login Unsuccessful " + error);
         });
 
   }
@@ -64,12 +74,24 @@ function DemoNativeAuth(){
   return(
     <View style={styles.container}>
       <Text style={styles.titleText}> Hexagon </Text>
-      <TextInput placeholder="Enter Username" placeholderTextColor="grey" style={styles.textInput} value={username}/>
-      <TextInput placeholder="Enter Username" placeholderTextColor="grey" style={styles.textInput} value={password}/>
+      <TextInput
+        placeholder="Enter Username"
+        placeholderTextColor="grey"
+        onChangeText={(text) => setUsername(text)}
+        style={styles.textInput}
+        value={username}
+      />
+      <TextInput
+        placeholder="Enter Username"
+        placeholderTextColor="grey"
+        style={styles.textInput}
+        onChangeText={(text) => setPassword(text)}
+        value={password}
+      />
       <View  style={{marginTop: 20,width:350,flexDirection:"row"}}>
         <View style={{width:160, height: 40, marginLeft:30}}>
         <Button
-           onPress = {loginWithFingerprint}
+           onPress = {login}
            title = "Login"
            color = "black"
            style = {{marginLeft:330}}
